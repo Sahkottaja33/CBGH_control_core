@@ -76,7 +76,7 @@ Hardware Components/ sensors.h — DS18B20 sensor interface. Reads greenhouse ai
     Protects the electronics inside the greenhouse environment.
 
 Schematic
-![Schematic](docs/schematic.png)
+![Schematic](GAHT_greenhouse.png)
 
 Data Logging
 
