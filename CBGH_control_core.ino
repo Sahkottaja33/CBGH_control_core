@@ -18,6 +18,7 @@
 #include "sensors.h"
 #include "fan_control.h"
 #include "data_logger.h"
+#include "time_manager.h"
 
 // ─────────────────────────────────────────────
 //  MAGIC NUMBER: aseta lanseeraushetken Unix-timestamp
@@ -27,8 +28,8 @@
 #define LAUNCH_EPOCH 1718700000UL
 
 // WiFi AP -asetukset
-#define AP_SSID     "Maalampo-AP"
-#define AP_PASSWORD "salasana123"   // vaihda haluamaksesi, väh. 8 merkkiä
+#define AP_SSID     "Telia_MC888B"
+#define AP_PASSWORD "japaninyuzu"   // vaihda haluamaksesi, väh. 8 merkkiä
 
 // Intervallit
 #define FAN_CHECK_INTERVAL_MS    (30UL * 1000UL)      // 30 sekuntia
@@ -50,7 +51,11 @@ void setup() {
   Serial.println(WiFi.softAPIP());
 
   initSensors();
+
+
+  initSensors();
   initDataLogger(LAUNCH_EPOCH);
+  initTimeManager()
   initFanControl();
 
   Serial.println("=== Alustus valmis ===");
@@ -59,7 +64,8 @@ void setup() {
 
 void loop() {
   unsigned long now = millis();
-
+  
+  updateSensors();
   // Reads values as fresh values
   float T_ilma = readTilma();
   float T_maa  = readTmaa();

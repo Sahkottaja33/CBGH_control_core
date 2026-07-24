@@ -1,10 +1,12 @@
 #include "sensors.h"
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include "config.h"
 
 // ─────────────────────────────────────────────
-//  sensors.cpp
-//  DS18B20-sensor reading based on their address
+//  sensors.cpp — korjattu versio
+//  Muutos: kaikki anturit pyydetään kerralla
+//  jolloin odotusaika on 750ms eikä 3x750ms
 // ─────────────────────────────────────────────
 
 static OneWire           oneWire(ONE_WIRE_BUS);
@@ -14,33 +16,45 @@ static DeviceAddress addrIlma = ADDR_T_ILMA;
 static DeviceAddress addrMaa  = ADDR_T_MAA;
 static DeviceAddress addrUlko = ADDR_T_ULKO;
 
+// Välimuisti viimeisimmille arvoille
+static float viimIlma = SENSOR_ERROR;
+static float viimMaa  = SENSOR_ERROR;
+static float viimUlko = SENSOR_ERROR;
+
 void initSensors() {
   sensors.begin();
-  Serial.print("FOUND ");
-  Serial.print(sensors.getDeviceCount());
-  Serial.println(" DS18B20-Sensors.");
-
-  // Sets all the sensors to a 12-bit accuracy
   sensors.setResolution(addrIlma, 12);
   sensors.setResolution(addrMaa,  12);
   sensors.setResolution(addrUlko, 12);
+  sensors.setWaitForConversion(true);
 
-  // This is a non‑blocking call; requestTemperatures() returns right away and does not pause execution.
-  sensors.setWaitForConversion(false);
+  Serial.print("Löydettiin ");
+  Serial.print(sensors.getDeviceCount());
+  Serial.println(" DS18B20-anturia.");
 }
 
-// Internal function: Request temperature and returns a value
-static float readSensor(DeviceAddress addr) {
-  sensors.requestTemperaturesByAddress(addr);
-  delay(750); // 12-bit conversion takes max 750 ms
-  float t = sensors.getTempC(addr);
-  if (t == DEVICE_DISCONNECTED_C) {
-    Serial.println("Warning: The sensor is not responding!");
-    return SENSOR_ERROR;
-  }
-  return t;
+// Lukee kaikki kolme anturia yhdellä 750ms odotuksella
+void updateSensors() {
+  sensors.requestTemperatures();
+
+  float t;
+
+  t = sensors.getTempC(addrIlma);
+  viimIlma = (t == DEVICE_DISCONNECTED_C) ? SENSOR_ERROR : t;
+
+  t = sensors.getTempC(addrMaa);
+  viimMaa = (t == DEVICE_DISCONNECTED_C) ? SENSOR_ERROR : t;
+
+  t = sensors.getTempC(addrUlko);
+  viimUlko = (t == DEVICE_DISCONNECTED_C) ? SENSOR_ERROR : t;
+
+  if (viimIlma == SENSOR_ERROR) Serial.println("VAROITUS: T_ilma-anturi ei vastaa!");
+  if (viimMaa  == SENSOR_ERROR) Serial.println("VAROITUS: T_maa-anturi ei vastaa!");
+  if (viimUlko == SENSOR_ERROR) Serial.println("VAROITUS: T_ulko-anturi ei vastaa!");
 }
 
-float readTilma() { return readSensor(addrIlma); }
-float readTmaa()  { return readSensor(addrMaa);  }
-float readTulko() { return readSensor(addrUlko); }
+float readTilma() { return viimIlma; }
+float readTmaa()  { return viimMaa;  }
+float readTulko() { return viimUlko; }
+
+

@@ -1,3 +1,4 @@
+#include 
 #ifndef FAN_CONTROL_H
 #define FAN_CONTROL_H
 
@@ -20,7 +21,7 @@
 // ─────────────────────────────────────────────
 
 // Shelly Plug S -settings
-#define SHELLY_IP   "192.168.4.2"
+
 #define SHELLY_PORT  80
 
 // Temperature Tresholds (°C)

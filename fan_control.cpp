@@ -14,11 +14,16 @@ static void shellySend(bool turnOn) {
   HTTPClient http;
   String url = "http://";
   url += SHELLY_IP;
-  url += "/relay/0?turn=";
-  url += turnOn ? "on" : "off";
+  url += "/rpc/Switch.Set?id=0&on=";
+  url += turnOn ? "true" : "false";
+
+  Serial.print("Shelly:");
+  Serial.print(url);
 
   http.begin(url);
+  http.setTimeout(5000);
   int httpCode = http.GET();
+  http.end();
 
   if (httpCode == 200) {
     Serial.print("Shelly: fan ");
@@ -26,8 +31,8 @@ static void shellySend(bool turnOn) {
   } else {
     Serial.print("Shelly HTTP-error: ");
     Serial.println(httpCode);
+    fanState = !turnOn;
   }
-  http.end();
 }
 
 void initFanControl() {

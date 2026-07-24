@@ -12,19 +12,16 @@
 
 // ─────────────────────────────────────────────
 
-#define ONE_WIRE_BUS 4
+#define ONE_WIRE_BUS 5
 
-// ── Change these: replace 0x00-values with real addresses ──
-// Example address: { 0x28, 0xFF, 0x3A, 0x12, 0x00, 0x00, 0x00, 0xAB }
-#define ADDR_T_ILMA { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
-#define ADDR_T_MAA  { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
-#define ADDR_T_ULKO { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
-// ─────────────────────────────────────────────────────────
 
-// Error-value ei the sensor is not responding
+// ──────────────────────────────────────────────
+
+// Error-value if the sensor is not responding
 #define SENSOR_ERROR -999.0
 
 void  initSensors();
+void  updateSensors();  // kutsu tätä ennen readTilma/Tmaa/Tulko
 float readTilma();
 float readTmaa();
 float readTulko();
