@@ -19,17 +19,15 @@
 #include "fan_control.h"
 #include "data_logger.h"
 #include "time_manager.h"
+#include "config.h"
 
 // ─────────────────────────────────────────────
 //  MAGIC NUMBER: aseta lanseeraushetken Unix-timestamp
 //  Hae osoitteesta https://www.unixtimestamp.com
 //  juuri ennen laitteen käyttöönottoa
 // ─────────────────────────────────────────────
-#define LAUNCH_EPOCH 1718700000UL
 
 // WiFi AP -asetukset
-#define AP_SSID     "Telia_MC888B"
-#define AP_PASSWORD "japaninyuzu"   // vaihda haluamaksesi, väh. 8 merkkiä
 
 // Intervallit
 #define FAN_CHECK_INTERVAL_MS    (30UL * 1000UL)      // 30 sekuntia
@@ -51,11 +49,8 @@ void setup() {
   Serial.println(WiFi.softAPIP());
 
   initSensors();
-
-
-  initSensors();
   initDataLogger(LAUNCH_EPOCH);
-  initTimeManager()
+  initTimeManager(LAUNCH_EPOCH);
   initFanControl();
 
   Serial.println("=== Alustus valmis ===");
@@ -66,6 +61,8 @@ void loop() {
   unsigned long now = millis();
   
   updateSensors();
+  handleSerialTimeCorrection();
+
   // Reads values as fresh values
   float T_ilma = readTilma();
   float T_maa  = readTmaa();
@@ -80,8 +77,9 @@ void loop() {
   // Logs data every 15 minutes
   if (now - lastLog >= LOG_INTERVAL_MS) {
     lastLog = now;
-    unsigned long timestamp = LAUNCH_EPOCH + (now / 1000UL);
+    unsigned long timestamp = getCurrentTimestamp();
     logData(timestamp, T_ilma, T_maa, T_ulko, getFanState());
+    confirmLoggedTimestamp(timestamp);
   }
 
   delay(1000); // small break

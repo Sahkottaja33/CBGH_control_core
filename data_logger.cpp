@@ -2,6 +2,7 @@
 #include "time_manager.h"
 #include <SPI.h>
 #include <SD.h>
+#include <Adafruit_NeoPixel.h>
 
 // ─────────────────────────────────────────────
 //  data_logger.cpp — korjattu versio
@@ -14,7 +15,16 @@
 //  3. Skipattuja jaksoja seurataan laskurilla
 //     ja kirjoitetaan nollarivinä kun SD palaa
 // ─────────────────────────────────────────────
+static Adafruit_NeoPixel statusLed(1, RGB_LED_PIN, NEO_GRB + NEO_KHZ800);
 
+static void setSdStatusLed(bool ok) {
+  if (ok) {
+    statusLed.setPixelColor(0, statusLed.Color(0, 35, 0));   // dim green
+  } else {
+    statusLed.setPixelColor(0, statusLed.Color(35, 0, 0));   // dim red
+  }
+  statusLed.show();
+}
 static bool          sdReady        = false;
 static unsigned long skippedCount   = 0;  // montako logia on skippattu ilman SD:tä
 static unsigned long lastTimestamp  = 0;  // viimeisin yritetty timestamp
@@ -40,8 +50,12 @@ static bool yritysSdAlustus() {
 }
 
 void initDataLogger(unsigned long launchEpoch) {
+  statusLed.begin();
+  statusLed.setBrightness(50);
+  
   SPI.begin(12, 13, 11, SD_CS);
   sdReady = yritysSdAlustus();
+  setSdStatusLed(sdReady);
 
   if (sdReady) {
     Serial.println("SD-kortti alustettu.");
@@ -80,6 +94,8 @@ void logData(unsigned long timestamp,
   if (!sdReady) {
     Serial.println("SD ei käytössä, yritetään uudelleenalustusta...");
     sdReady = yritysSdAlustus();
+    setSdStatusLed(sdReady);
+
     if (!sdReady) {
       skippedCount++;
       Serial.printf("SD edelleen poissa. Skipattuja jaksoja: %lu\n", skippedCount);
@@ -93,6 +109,7 @@ void logData(unsigned long timestamp,
   if (!f) {
     Serial.println("VIRHE: CSV-tiedostoa ei voitu avata!");
     sdReady = false;
+    setSdStatusLed(false);
     skippedCount++;
     return;
   }
@@ -111,7 +128,15 @@ void logData(unsigned long timestamp,
   // Kirjoitetaan varsinainen rivi
   kirjoitaRivi(f, timestamp, T_ilma, T_maa, T_ulko, fanOn);
   f.close(); // suljetaan AINA
+
   confirmLoggedTimestamp(timestamp);
+
   Serial.printf("LOG %lu | ilma=%.2f maa=%.2f ulko=%.2f tuuletin=%s\n",
                 timestamp, T_ilma, T_maa, T_ulko, fanOn ? "ON" : "OFF");
 }
+
+void addSkippedIntervals(unsigned long count) {
+  skippedCount += count;
+}
+
+

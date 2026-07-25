@@ -1,4 +1,4 @@
-#include 
+#include "config.h"
 #ifndef FAN_CONTROL_H
 #define FAN_CONTROL_H
 

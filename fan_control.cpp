@@ -59,6 +59,10 @@ void updateFanControl(float T_ilma, float T_maa) {
                   T_ilma, T_maa, TEMP_DIFF_ON);
   } else if (diff < -TEMP_DIFF_OFF_BELOW) {
     // “The soil is clearly warmer than the air → ventilation prevents heat loss.
+    if(T_maa <=13.0){
+      shouldBeOn = false;
+      Serial.printf("Tuuletin pois: T_maa(%.1f) <= 13.0, heat will no be released from storage\n", T_maa);
+    }
     // HUOM: koodiapina tarkista kirjallisuudesta logiikka!!!!!
     shouldBeOn = true;
     Serial.printf("Tuuletin päälle: T_maa(%.1f) > T_ilma(%.1f) + %.1f\n",
