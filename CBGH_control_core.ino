@@ -39,7 +39,10 @@ unsigned long lastLog      = 0;
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) { delay(10); }
+  unsigned long serialWaitStart = millis();
+  while (!Serial && (millis() - serialWaitStart < 3000)) {
+    delay(10);
+  }
   delay(1000);
   Serial.println("=== Maalämpövarasto käynnistyy ===");
 

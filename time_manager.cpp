@@ -3,7 +3,7 @@
 #include <SD.h>
 #include "data_logger.h"
 #include "config.h"
-#include "data_logger.h"
+
 // ... (kaikki aiempi koodi sellaisenaan) ...
 static unsigned long baseEpoch       = 0;  // Unix time at millis()=0 equivalent
 static unsigned long millisAtBase    = 0;  // millis() when baseEpoch was set
@@ -147,8 +147,8 @@ bool handleSerialTimeCorrection() {
   unsigned long currentTs = getCurrentTimestamp();
   unsigned long skipped = (newTs > currentTs) ? (newTs- currentTs) : 0;
 
-  unsigned long intervalSec = LOG_INTERVAL_MS / 1000 UL;
-  unsigned log skippedIntervals = (intevalSec >0) ? (skipped / intervalSec) :0;
+  unsigned long intervalSec = LOG_INTERVAL_MS / 1000UL;
+  unsigned long skippedIntervals = (intervalSec > 0) ? (skipped / intervalSec) : 0;
   Serial.print("[TimeManager] Time accepted. Approx. ");
   Serial.print(skipped / 3600);
   Serial.println(" hour(s) will be filled with zero rows.");
