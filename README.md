@@ -76,7 +76,7 @@ Hardware Components/ sensors.h — DS18B20 sensor interface. Reads greenhouse ai
     Protects the electronics inside the greenhouse environment.
 
 Schematic
-![Schematic](GAHT_greenhouse.png)
+![Schematic](Greenhouse_schematic.png)
 
 Data Logging
 
@@ -114,7 +114,7 @@ Fan behavior:
 
     ΔT < 4 → release heat → fan ON (conditional)
 
-    SoilTemp near 10°C → conserve soil heat → fan OFF
+    SoilTemp near 13°C → conserve soil heat → fan OFF
 
     OutdoorTemp used for contextual decisions
 
@@ -132,15 +132,9 @@ Repository Contents
 
     KiCad schematic (.kicad_sch)
 
-    KiCad project file (.kicad_pro)
-
-    PCB layout file (.kicad_pcb)
-
     Custom symbol libraries (.kicad_sym)
 
     Supporting KiCad configuration files
-
-    Documentation assets (optional)
 
 Installation & Deployment
 
